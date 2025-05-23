@@ -1,0 +1,85 @@
+import tkinter as tk
+from tkinter import scrolledtext, messagebox
+from transformers import pipeline
+import threading
+import pyttsx3
+
+# Load summarizer
+summarizer = pipeline("summarization", model="facebook/bart-large-cnn")
+
+# Initialize text-to-speech engine
+engine = pyttsx3.init()
+
+# Function to summarize text
+def summarize_text():
+    input_text = text_input.get("1.0", tk.END).strip()
+    
+    if not input_text:
+        messagebox.showwarning("Warning", "Please enter some text.")
+        return
+
+    if len(input_text.split()) < 10:
+        messagebox.showwarning("Warning", "Text too short to summarize.")
+        return
+
+    summarize_btn.config(state=tk.DISABLED)
+    summary_output.delete("1.0", tk.END)
+    summary_output.insert(tk.END, "Summarizing...")
+
+    def run():
+        try:
+            result = summarizer(input_text, max_length=130, min_length=30, do_sample=False)[0]['summary_text']
+            summary_output.delete("1.0", tk.END)
+            summary_output.insert(tk.END, result)
+        except Exception as e:
+            summary_output.delete("1.0", tk.END)
+            summary_output.insert(tk.END, f"Error: {str(e)}")
+        finally:
+            summarize_btn.config(state=tk.NORMAL)
+
+    threading.Thread(target=run).start()
+
+# Function to read summary out loud
+def speak_summary():
+    text = summary_output.get("1.0", tk.END).strip()
+    if not text:
+        messagebox.showinfo("Info", "Nothing to speak.")
+        return
+    engine.say(text)
+    engine.runAndWait()
+
+# GUI setup
+root = tk.Tk()
+root.title("Text Summarizer NLP App")
+root.geometry("800x600")
+root.configure(bg="#1E2A38")
+
+# Fonts and styles
+label_font = ("Helvetica", 14, "bold")
+text_font = ("Helvetica", 12)
+
+# Header
+tk.Label(root, text="Text Summarizer NLP App", font=("Helvetica", 20, "bold"), fg="white", bg="#1E2A38").pack(pady=15)
+
+# Enter Text
+tk.Label(root, text="Enter Text:", font=label_font, fg="white", bg="#1E2A38").pack(pady=(10, 5))
+text_input = scrolledtext.ScrolledText(root, font=text_font, wrap=tk.WORD, height=10, bg="#2B3A4A", fg="white", insertbackground='white')
+text_input.pack(padx=20, pady=5, fill=tk.BOTH)
+
+# Summarize Button
+summarize_btn = tk.Button(root, text="Summarize", font=label_font, bg="#FF8C42", fg="white", command=summarize_text)
+summarize_btn.pack(pady=15)
+
+# Summary Label
+tk.Label(root, text="Summary:", font=label_font, fg="white", bg="#1E2A38").pack(pady=(10, 5))
+
+# Output Text
+summary_output = scrolledtext.ScrolledText(root, font=text_font, wrap=tk.WORD, height=8, bg="#2B3A4A", fg="white", insertbackground='white')
+summary_output.pack(padx=20, pady=5, fill=tk.BOTH)
+
+# Speak Button
+speak_btn = tk.Button(root, text="Speak Summary", font=label_font, bg="#3399FF", fg="white", command=speak_summary)
+speak_btn.pack(pady=10)
+
+# Start GUI
+root.mainloop()
