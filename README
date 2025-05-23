@@ -1,0 +1,36 @@
+# Text Summarizer NLP App
+A simple Python GUI application that summarizes long pieces of text using a pre-trained NLP model (facebook/bart-large-cnn) and can also read the summary out loud using text-to-speech.
+Features
+Summarizes input text using Hugging Face's transformers library.
+Text-to-speech feature to read the summary aloud.
+Intuitive GUI built with Tkinter.
+
+Getting Started
+Prerequisites
+Make sure you have Python 3.7+ installed. Then, install the required libraries using pip:
+pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu
+pip install transformers
+pip install pyttsx3
+Note: torch is required by the transformers library.
+File Structure
+Place the provided .py file in your working directory.
+How to Run
+Open your terminal or command prompt and run:
+python your_file_name.py
+Replace your_file_name.py with the actual name of the Python file.
+
+
+How to Use
+launch the app — a GUI window will open.
+Paste or type the text you want to summarize in the "Enter Text" area.
+Click the "Summarize" button.
+The summary will appear in the "Summary" section.
+Click "Speak Summary" to hear the summary read aloud.
+
+Model Used
+facebook/bart-large-cnn from Hugging Face's transformers library.
+The model performs extractive summarization and is suitable for news articles and general long texts.
+
+ Notes
+The app may take a few seconds to generate a summary, depending on text length and your system.
+Ensure you have a working microphone and speaker for the TTS (text-to-speech) feature to function properly.
